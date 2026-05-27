@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Laço — Namoro e Amizade</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f5;display:flex;justify-content:center;min-height:100vh;padding:20px}
+.phone{width:390px;background:#fff;border-radius:40px;border:1px solid #ddd;overflow:hidden;display:flex;flex-direction:column;min-height:760px;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sbar{background:#e8427a;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;font-size:12px;color:#fff;font-weight:500}
+.screen{flex:1;display:none;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.bnav{display:flex;border-top:1px solid #eee;background:#fff}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;cursor:pointer;color:#aaa;font-size:10px;gap:2px;border:none;background:none}
+.bnav-btn.active{color:#e8427a}
+.bnav-btn i{font-size:22px}
+.card-area{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;position:relative}
+.pcard{width:100%;max-width:320px;background:#fff;border-radius:22px;border:1px solid #eee;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.pcard-top{height:240px;display:flex;align-items:center;justify-content:center;font-size:88px;position:relative}
+.pcard-badge{position:absolute;top:12px;right:12px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.92)}
+.pcard-body{padding:16px}
+.pcard-name{font-size:21px;font-weight:600;color:#1a1a1a}
+.pcard-sub{font-size:12px;color:#888;margin-top:3px}
+.pcard-bio{font-size:13px;color:#555;margin-top:7px;line-height:1.55}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.tag{font-size:11px;padding:3px 10px;border-radius:20px;background:#f5f5f5;color:#666}
+.acts{display:flex;justify-content:center;gap:18px;padding:12px 16px 20px}
+.abtn{width:56px;height:56px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.abtn-like{background:#e8427a;border-color:#e8427a;color:#fff}
+.abtn-friend{background:#4A90D9;border-color:#4A90D9;color:#fff}
+.abtn-super{background:#a855f7;border-color:#a855f7;color:#fff}
+.toast{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;white-space:nowrap;opacity:0;transition:opacity .25s;pointer-events:none;z-index:5}
+.toast.show{opacity:1}
+.filter-bar{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;border-bottom:1px solid #f0f0f0;scrollbar-width:none}
+.fchip{padding:5px 14px;border-radius:20px;font-size:12px;border:1px solid #ddd;background:#fff;color:#666;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.fchip.on-r{background:#e8427a;color:#fff;border-color:#e8427a}
+.fchip.on-b{background:#4A90D9;color:#fff;border-color:#4A90D9}
+.fchip.on-p{background:#a855f7;color:#fff;border-color:#a855f7}
+.dist-row{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f0f0f0}
+.dist-row label{font-size:12px;color:#888;white-space:nowrap}
+.dist-row input[type=range]{flex:1;accent-color:#e8427a}
+.dist-row span{font-size:12px;font-weight:600;color:#333;min-width:36px}
+.match-overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:20;background:#e8427a;border-radius:22px}
+.match-overlay.show{display:flex}
+.heart-anim{font-size:44px;animation:heartpop .5s ease forwards;opacity:0}
+.heart-anim:nth-child(1){animation-delay:.1s}
+.heart-anim:nth-child(2){animation-delay:.25s;font-size:60px}
+.heart-anim:nth-child(3){animation-delay:.4s}
+@keyframes heartpop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:1}}
+.m-ava{width:64px;height:64px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f9a8c9}
+.match-title{font-size:28px;font-weight:700;color:#fff;margin:10px 0 6px}
+.match-sub{font-size:13px;color:rgba(255,255,255,.88);margin-bottom:24px;text-align:center;padding:0 24px}
+.match-cta{background:#fff;color:#e8427a;border:none;padding:13px 0;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;width:230px}
+.match-skip{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);padding:11px 0;border-radius:24px;font-size:13px;cursor:pointer;width:230px}
+.chat-list{flex:1;overflow-y:auto}
+.ci{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.c-ava{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ci-name{font-size:14px;font-weight:600;color:#1a1a1a}
+.ci-prev{font-size:12px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.ci-time{font-size:11px;color:#bbb;text-align:right}
+.ci-dot{width:18px;height:18px;border-radius:50%;background:#e8427a;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;margin:4px 0 0 auto}
+.cwin{display:flex;flex-direction:column;flex:1}
+.chead{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #f0f0f0}
+.chead-back{font-size:22px;cursor:pointer;color:#999}
+.chead-name{font-size:15px;font-weight:600;color:#1a1a1a}
+.chead-status{font-size:11px;color:#22c55e}
+.ai-badge{font-size:10px;background:#4A90D9;color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:6px;background:#fafafa}
+.msg{max-width:78%;padding:10px 13px;border-radius:18px;font-size:13px;line-height:1.55}
+.msg-r{background:#fff;color:#1a1a1a;align-self:flex-start;border-bottom-left-radius:4px;border:1px solid #eee}
+.msg-s{background:#e8427a;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg-t{font-size:10px;color:#bbb;margin-top:2px}
+.msg-tr{text-align:right}
+.typing{display:flex;align-items:center;gap:5px;padding:10px 14px;background:#fff;border-radius:18px;align-self:flex-start;border:1px solid #eee}
+.dot{width:7px;height:7px;border-radius:50%;background:#ccc;animation:bounce .9s infinite}
+.dot:nth-child(2){animation-delay:.15s}
+.dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+.cinput{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #eee;background:#fff}
+.cinput input{flex:1;border:1px solid #ddd;border-radius:22px;padding:9px 16px;font-size:13px;background:#f7f7f7;color:#1a1a1a;outline:none}
+.cinput button{width:38px;height:38px;border-radius:50%;background:#e8427a;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px}
+.prof-view{padding:20px;overflow-y:auto;flex:1}
+.prof-ava{width:80px;height:80px;border-radius:50%;border:3px solid #e8427a;display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 10px}
+.sect{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.07em;margin:18px 0 9px}
+.pref-row{display:flex;flex-wrap:wrap;gap:7px}
+.pchip{padding:7px 15px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid #ddd;color:#666;background:#fff}
+.pchip.sr{background:#e8427a;color:#fff;border-color:#e8427a}
+.save-btn{width:100%;padding:14px;background:#e8427a;color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:600;cursor:pointer;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="sbar"><span>💕 Laço</span><span id="clock">9:41</span><span>📶 🔋</span></div>
+  <div class="screen active" id="sc-disc">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 14px 5px">
+      <div style="font-size:18px;font-weight:600;color:#1a1a1a">Descobrir</div>
+      <div style="font-size:12px;color:#aaa" id="km-label">até 15km</div>
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="dist-row">
+      <label>Distância</label>
+      <input type="range" min="1" max="50" value="15" step="1" id="distSlider" oninput="updateDist(this.value)"/>
+      <span id="distVal">15km</span>
+    </div>
+    <div class="card-area">
+      <div id="toast" class="toast"></div>
+      <div class="pcard" id="pcard"></div>
+    </div>
+    <div class="acts">
+      <button class="abtn" onclick="swipe('pass')"><i class="ti ti-x" style="font-size:24px;color:#aaa"></i></button>
+      <button class="abtn abtn-super" onclick="swipe('super')"><i class="ti ti-star" style="font-size:24px"></i></button>
+      <button class="abtn abtn-friend" onclick="swipe('friend')"><i class="ti ti-users" style="font-size:24px"></i></button>
+      <button class="abtn abtn-like" onclick="swipe('like')"><i class="ti ti-heart" style="font-size:24px"></i></button>
+    </div>
+  </div>
+  <div class="screen" id="sc-msgs">
+    <div style="padding:13px 16px 8px;font-size:18px;font-weight:600;color:#1a1a1a">Mensagens</div>
+    <div class="chat-list" id="chatList"></div>
+    <div class="cwin" id="chatWin" style="display:none"></div>
+  </div>
+  <div class="screen" id="sc-prof">
+    <div class="prof-view">
+      <div style="text-align:center;margin-bottom:20px">
+        <div class="prof-ava">🧑</div>
+        <div style="font-size:22px;font-weight:600;color:#1a1a1a">Você</div>
+        <div style="font-size:13px;color:#aaa;margin-top:3px">📍 Manaus, AM</div>
+      </div>
+      <div class="sect">Procurando</div>
+      <div class="pref-row">
+        <div class="pchip sr" onclick="this.classList.toggle('sr')">❤️ Romance</div>
+        <div class="pchip" onclick="this.classList.toggle('sr')">👥 Amizade</div>
+        <div class="pchip" onclick="this.classList.toggle('sr')">✨ Ambos</div>
+      </div>
+      <div class="sect">Interesses</div>
+      <div class="pref-row" id="iRow"></div>
+      <button class="save-btn" onclick="showT('Perfil salvo! ✓')">Salvar perfil</button>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="bnav-btn active" id="bn-disc" onclick="showS('disc')"><i class="ti ti-flame"></i><span>Descobrir</span></button>
+    <button class="bnav-btn" id="bn-msgs" onclick="showS('msgs')"><i class="ti ti-message-circle"></i><span>Mensagens</span></button>
+    <button class="bnav-btn" id="bn-prof" onclick="showS('prof')"><i class="ti ti-user"></i><span>Perfil</span></button>
+  </div>
+</div>
+<script>
+const P=[{name:'Ana Lima',age:24,emoji:'👩',bg:'#ffeef4',type:'Romance',dist:3,tags:['☕ Café','📚 Leitura','🎵 Música'],bio:'Amo longas conversas e cafés. Procuro alguém genuíno!',persona:'Você é Ana Lima, 24 anos, de Manaus. Carismática e calorosa. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Carlos Souza',age:27,emoji:'👨',bg:'#eef4ff',type:'Amizade',dist:7,tags:['🎮 Games','🏋️ Academia','🍕 Pizza'],bio:'Nerd de games e fã de academia!',persona:'Você é Carlos Souza, 27 anos, de Manaus. Descontraído e engraçado. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Beatriz Costa',age:22,emoji:'👩‍🦱',bg:'#f4eeff',type:'Romance',dist:2,tags:['🎨 Arte','✈️ Viagens','🐱 Gatinhos'],bio:'Artista apaixonada pela Amazônia.',persona:'Você é Beatriz Costa, 22 anos, artista em Manaus. Poética e criativa. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Rafael Nunes',age:29,emoji:'🧔',bg:'#eefff4',type:'Ambos',dist:12,tags:['⚽ Futebol','🎸 Viola','🌊 Rio'],bio:'Engenheiro de dia, músico de noite.',persona:'Você é Rafael Nunes, 29 anos, de Manaus. Tranquilo e filosófico. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Larissa Melo',age:25,emoji:'👩‍🦰',bg:'#fff4ee',type:'Romance',dist:5,tags:['🍜 Culinária','📷 Foto','🎬 Cinema'],bio:'Fotógrafa e foodie pela cidade.',persona:'Você é Larissa Melo, 25 anos, de Manaus. Animada e extrovertida. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Diego Ferreira',age:31,emoji:'🧑‍🦳',bg:'#f0f4ff',type:'Amizade',dist:9,tags:['📖 Livros','♟️ Xadrez','🎭 Teatro'],bio:'Professor apaixonado por debates e cultura.',persona:'Você é Diego Ferreira, 31 anos, professor em Manaus. Intelectual e gentil. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Camila Rocha',age:23,emoji:'👩‍🦳',bg:'#fff0f8',type:'Romance',dist:4,tags:['💃 Dança','🎤 Karaokê','🛍️ Moda'],bio:'Dançarina e amante da vida!',persona:'Você é Camila Rocha, 23 anos, dançarina em Manaus. Energética e divertida. Responda em 1-3 frases em português. Nunca diga que é IA.'},{name:'Thiago Santos',age:28,emoji:'🧑‍🦱',bg:'#f4fff0',type:'Ambos',dist:18,tags:['🌱 Natureza','🚴 Ciclismo','🍃 Vegano'],bio:'Ativista ambiental explorando a Amazônia.',persona:'Você é Thiago Santos, 28 anos, ativista em Manaus. Engajado e inspirador. Responda em 1-3 frases em português. Nunca diga que é IA.'}];
+const INTERESTS=['🎵 Música','📚 Leitura','🎮 Games','✈️ Viagens','☕ Café','🎨 Arte','🐕 Pets','🏋️ Academia','🍕 Comida','📷 Foto','🌿 Natureza','🎬 Cinema'];
+const FILTERS=['Todos','Romance','Amizade','Perto (5km)','20-25','25-30'];
+let pidx=0,maxDist=15,activeFilter='Todos',currentChat=null;
+const chatMsgs={0:[{t:'Oi! Vi que tivemos um match 😊',r:true}],1:[{t:'Eai! Vai jogar esse fds?',r:true}],2:[{t:'Amei suas fotos! ✨',r:false},{t:'Obrigada! 🌿',r:true}]};
+const chats=[{id:0,name:'Ana Lima',emoji:'👩',bg:'#ffeef4'},{id:1,name:'Carlos Souza',emoji:'👨',bg:'#eef4ff'},{id:2,name:'Beatriz Costa',emoji:'👩‍🦱',bg:'#f4eeff'}];
+function getV(){return P.filter(p=>{if(p.dist>maxDist)return false;if(activeFilter==='Romance'&&p.type!=='Romance')return false;if(activeFilter==='Amizade'&&p.type!=='Amizade')return false;if(activeFilter==='Perto (5km)'&&p.dist>5)return false;if(activeFilter==='20-25'&&(p.age<20||p.age>25))return false;if(activeFilter==='25-30'&&(p.age<25||p.age>30))return false;return true;});}
+function renderCard(){const v=getV();const pc=document.getElementById('pcard');if(!v.length){pc.innerHTML='<div style="text-align:center;padding:40px;color:#bbb">Nenhum perfil encontrado</div>';return;}const p=v[pidx%v.length];const bc=p.type==='Romance'?'#c03060':p.type==='Amizade'?'#185fa5':'#6b21a8';pc.innerHTML=`<div class="match-overlay" id="matchOv"><div style="display:flex;margin-bottom:14px"><span class="heart-anim">💗</span><span class="heart-anim" style="font-size:60px">💕</span><span class="heart-anim">💗</span></div><div style="display:flex;margin-bottom:16px"><div class="m-ava">🧑</div><div class="m-ava" style="margin-left:-12px">${p.emoji}</div></div><div class="match-title">É um Match!</div><div class="match-sub">Você e ${p.name} se curtiram!</div><button class="match-cta" onclick="goChat()">Enviar mensagem</button><button class="match-skip" onclick="closeMatch()">Continuar navegando</button></div><div class="pcard-top" style="background:${p.bg}">${p.emoji}<span class="pcard-badge" style="color:${bc}">${p.type==='Romance'?'● Romance':p.type==='Amizade'?'● Amizade':'● Ambos'}</span></div><div class="pcard-body"><div class="pcard-name">${p.name}, ${p.age}</div><div class="pcard-sub">📍 Manaus · ${p.dist}km</div><div class="pcard-bio">${p.bio}</div><div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`;}
+function renderFilters(){document.getElementById('filterBar').innerHTML=FILTERS.map(f=>{const on=f===activeFilter;const cls=on?(f==='Romance'?'on-r':f==='Amizade'?'on-b':'on-p'):'';return`<div class="fchip ${cls}" onclick="setFilter('${f}')">${f}</div>`;}).join('');}
+function setFilter(f){activeFilter=f;pidx=0;renderFilters();renderCard();}
+function updateDist(v){maxDist=parseInt(v);document.getElementById('distVal').textContent=v+'km';document.getElementById('km-label').textContent='até '+v+'km';pidx=0;renderCard();}
+function swipe(type){const v=getV();if(!v.length)return;const msgs={like:'Curtido! ❤️',friend:'Amizade enviada! 👋',pass:'Próximo...',super:'Super like! ⭐'};showT(msgs[type]);if((type==='like'||type==='super')&&Math.random()>.38){setTimeout(()=>{const m=document.getElementById('matchOv');if(m)m.classList.add('show');},500);return;}pidx++;renderCard();}
+function closeMatch(){const m=document.getElementById('matchOv');if(m)m.classList.remove('show');pidx++;renderCard();}
+function goChat(){closeMatch();showS('msgs');}
+function showT(msg){const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
+function showS(s){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.bnav-btn').forEach(e=>e.classList.remove('active'));document.getElementById('sc-'+s).classList.add('active');document.getElementById('bn-'+s).classList.add('active');if(s==='msgs')renderChatList();}
+function renderChatList(){document.getElementById('chatWin').style.display='none';const cl=document.getElementById('chatList');cl.style.display='';cl.innerHTML=chats.map((c,i)=>{const ms=chatMsgs[c.id]||[];const last=ms.length?ms[ms.length-1].t:'Diga oi!';return`<div class="ci" onclick="openChat(${i})"><div class="c-ava" style="background:${c.bg}">${c.emoji}</div><div style="flex:1;min-width:0"><div class="ci-name">${c.name}</div><div class="ci-prev">${last}</div></div><div><div class="ci-time">agora</div>${i===0?'<div class="ci-dot">1</div>':''}</div></div>`;}).join('');}
+function openChat(i){currentChat=i;const c=chats[i];const cw=document.getElementById('chatWin');document.getElementById('chatList').style.display='none';cw.style.display='flex';cw.style.flexDirection='column';cw.style.flex='1';const ms=chatMsgs[c.id]||[];cw.innerHTML=`<div class="chead"><span class="chead-back" onclick="backList()"><i class="ti ti-arrow-left"></i></span><div class="c-ava" style="width:34px;height:34px;font-size:18px;background:${c.bg}">${c.emoji}</div><div style="flex:1;margin-left:8px"><div class="chead-name">${c.name}<span class="ai-badge">IA</span></div><div class="chead-status">online agora</div></div></div><div class="msgs" id="msgArea">${ms.map(m=>`<div><div class="msg ${m.r?'msg-r':'msg-s'}">${m.t}</div><div class="msg-t ${m.r?'':'msg-tr'}">${m.r?c.name.split(' ')[0]:'Você'} · agora</div></div>`).join('')}</div><div class="cinput"><input id="mInput" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter')sendMsg()"/><button onclick="sendMsg()"><i class="ti ti-send"></i></button></div>`;scrollMsgs();}
+function backList(){currentChat=null;document.getElementById('chatWin').style.display='none';renderChatList();}
+function scrollMsgs(){const a=document.getElementById('msgArea');if(a)a.scrollTop=a.scrollHeight;}
+async function sendMsg(){const inp=document.getElementById('mInput');const txt=inp.value.trim();if(!txt||currentChat===null)return;inp.value='';const c=chats[currentChat];if(!chatMsgs[c.id])chatMsgs[c.id]=[];chatMsgs[c.id].push({t:txt,r:false});const area=document.getElementById('msgArea');area.innerHTML+=`<div><div class="msg msg-s">${txt}</div><div class="msg-t msg-tr">Você · agora</div></div>`;scrollMsgs();area.innerHTML+=`<div id="tid"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;scrollMsgs();const profile=P.find(p=>p.name===c.name);const persona=profile?.persona||'Responda naturalmente em português, 1-3 frases.';const history=chatMsgs[c.id].slice(-8).map(m=>({role:m.r?'assistant':'user',content:m.t}));try{const resp=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:persona,messages:history})});const data=await resp.json();const reply=data.reply||null;const ti=document.getElementById('tid');if(ti)ti.remove();if(reply){chatMsgs[c.id].push({t:reply,r:true});area.innerHTML+=`<div><div class="msg msg-r">${reply}</div><div class="msg-t">${c.name.split(' ')[0]} · agora</div></div>`;}}catch(e){const ti=document.getElementById('tid');if(ti)ti.remove();const fb=['Que legal! 😊','Concordo!','E você?','Adorei! 💬'][Math.floor(Math.random()*4)];chatMsgs[c.id].push({t:fb,r:true});area.innerHTML+=`<div><div class="msg msg-r">${fb}</div><div class="msg-t">${c.name.split(' ')[0]} · agora</div></div>`;}scrollMsgs();}
+(function(){renderFilters();renderCard();document.getElementById('iRow').innerHTML=INTERESTS.map((v,i)=>`<div class="pchip${i<4?' sr':''}" onclick="this.classList.toggle('sr')">${v}</div>`).join('');setInterval(()=>{const d=new Date();document.getElementById('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');},1000);})();
+</script>
+</body>
+</html>
